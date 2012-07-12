@@ -1,0 +1,30 @@
+I'm using the latest version of Android Support Library (for Fragment, FragmentActivity etc classes). 
+This bug is present on < 3.0 devices (tested with 2.1 emulator from Android SDK), but not on 4.0.3 (Samsung Galaxy S2).
+
+I have a case where I'm implementing Tab content with Fragments, where one Fragment (test1)  is replaced by another (test2). If the test1 fragment contains an EditText widget, keyboard shows up when the EditText is focused. 
+
+However, when I replace the test1 Fragment with test2 Fragment (with Button click or other event in test1 fragment) like this:
+
+FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+Fragment fragment1 = getActivity().getSupportFragmentManager().findFragmentByTag("simple");
+fragmentTransaction.detach(fragment1);
+fragmentTransaction.add(R.id.realtabcontent, fragment);
+//fragmentTransaction.replace(R.id.realtabcontent, fragment); // using just .replace also fails in the same way
+      			fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+fragmentTransaction.addToBackStack(null);
+fragmentTransaction.commit();
+
+and then go back to the test1 activity, I can no longer get the keyboard to show up when focusing the EditText widget.
+
+I've attached a minimal project that reproduces this problem (I've included the support library). 
+
+Steps to reproduce:
+1. Touch in EditText1 so that the keyboard appears.
+2. Touch done after entering text (so the keyboard closes).
+3. Click on "Button" to show test2 fragment
+4. Press back to go back to test1 fragment
+5. try touching EditText1 to make the keyboard show again (doesn't show)
+
+
+So this works as expected when the App is run on Android 4.0.3
